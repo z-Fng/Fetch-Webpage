@@ -1,0 +1,44 @@
+name: Fetch Webpage
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL'
+        required: true
+        default: ''
+        type: string
+      method:
+        description: 'HTTP Method'
+        required: false
+        default: 'GET'
+        type: choice
+        options:
+          - GET
+          - POST
+
+jobs:
+  fetch-webpage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch webpage information
+        id: fetch
+        run: |
+          response=$(curl -s -o response_body -w "%{http_code}" -X "${{ inputs.method }}" "${{ inputs.url }}")
+          http_code=$?
+          
+          response_body=$(cat response_body)
+          
+          if [ $http_code -ne 0 ]; then
+            echo "❌ Curl failed with exit code: $http_code"
+            exit 1
+          fi
+          
+          echo "URL: ${{ inputs.url }}"
+          echo "HTTP Method: ${{ inputs.method }}"
+          echo "HTTP Status Code: $response"
+          echo "Response Body Length: ${#response_body} characters"
+        
+          
+          echo "=== Response Body ==="
+          echo "$response_body"
