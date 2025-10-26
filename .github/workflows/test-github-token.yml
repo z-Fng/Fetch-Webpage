@@ -1,0 +1,20 @@
+name: Check GitHub Token Per Job
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Show GITHUB_TOKEN info (Job1)
+        shell: pwsh
+        run: |
+          $url = "https://api.github.com/rate_limit"
+          $token = $env:GITHUB_TOKEN
+          Write-Host $token
+          Write-Host $token.Length
+          $response = Invoke-RestMethod -Uri $url -Headers @{ Authorization = "token $token"}
+          $response.resources
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
